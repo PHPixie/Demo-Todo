@@ -28,7 +28,7 @@ class Project extends \PHPixie\DefaultBundle\Processor\HTTP\Actions
         
         $project->name = $request->data()->getRequired('name');
         $project->tasksTotal = 0;
-        $project->tasksCompleted = 0;
+        $project->tasksDone = 0;
         $project->save();
         
         return $this->projectRedirect($project);
@@ -36,7 +36,8 @@ class Project extends \PHPixie\DefaultBundle\Processor\HTTP\Actions
     
     public function viewAction($request)
     {
-        $project = $this->builder->components()->orm()->query('project')->findOne(array('tasks'));
+        $id = $request->attributes()->getRequired('id');
+        $project = $this->builder->components()->orm()->query('project')->in($id)->findOne(array('tasks'));
         return $this->builder->components()->template()->render(
             'app:project/view',
             array(
@@ -50,7 +51,7 @@ class Project extends \PHPixie\DefaultBundle\Processor\HTTP\Actions
         $orm = $this->builder->components()->orm();
         $data = $request->data();
         
-        $project = $orm->query('project')->in($data->getRequired('project_id'))->findOne();
+        $project = $orm->query('project')->in($data->getRequired('projectId'))->findOne();
         
         $task = $orm->createEntity('task');
         $task->name = $data->getRequired('name');
@@ -63,13 +64,54 @@ class Project extends \PHPixie\DefaultBundle\Processor\HTTP\Actions
         return $this->projectRedirect($project);
     }
     
+    public function markTaskDoneAction($request)
+    {
+        $orm = $this->builder->components()->orm();
+        $data = $request->data();
+        
+        $task = $orm->query('task')->in($data->getRequired('id'))->findOne();
+        
+        $task->isDone = true;
+        $task->save();
+        
+        $project = $task->project();
+        $project->tasksDone = $project->tasksDone+1;
+        $project->save();
+        
+        return array(
+            'tasksDone' => $project->tasksDone,
+            'tasksTotal' => $project->tasksTotal
+        );
+    }
+    
+    public function deleteTaskAction($request)
+    {
+        $orm = $this->builder->components()->orm();
+        $data = $request->data();
+        
+        $task = $orm->query('task')->in($data->getRequired('id'))->findOne();
+        
+        $project = $task->project();
+        $project->tasksTotal = $project->tasksTotal-1;
+        if($task->isDone) {
+            $project->tasksDone = $project->tasksDone-1;
+        }
+        
+        $project->save();
+        $task->delete();
+        
+        return array(
+            'tasksDone' => $project->tasksDone,
+            'tasksTotal' => $project->tasksTotal
+        );
+    }
+    
     protected function projectRedirect($project)
     {
         $url = $this->builder->frameworkBuilder()->http()->routeTranslator()->generatePath(
-            'app.default',
+            'app.view',
             array(
-                'processor' => 'project',
-                'action'    => 'view',
+                'id' => $project->id
             )
         );
         return $this->builder->components()->http()->responses()->redirect($url);

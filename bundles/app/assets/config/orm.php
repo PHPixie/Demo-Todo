@@ -5,7 +5,10 @@ return array(
         array(
             'type'  => 'oneToMany',
             'owner' => 'project',
-            'items' => 'task'
+            'items' => 'task',
+            'itemsOptions' => array(
+                'onOwnerDelete' => 'delete'
+            )
         )
     )
 );

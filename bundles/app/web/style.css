@@ -1,0 +1,29 @@
+@media (min-width: 768px) {
+    .container {
+        width: 750px;
+    }
+}
+
+.delete:before {
+    cursor:pointer;
+}
+
+.done .counter{
+    background-color: #3c763d;
+}
+
+.task .icon:before {
+    content: "\f10c";
+    cursor:pointer;
+}
+
+.task.done .icon:before {
+    content: "\f058";
+    color: #3c763d;
+    cursor:default;
+}
+
+.task.done span{
+    text-decoration: line-through;
+    color: #aaa;
+}

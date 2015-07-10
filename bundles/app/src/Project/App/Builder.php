@@ -9,6 +9,11 @@ class Builder extends \PHPixie\DefaultBundle\Builder
         return new HTTPProcessor($this);
     }
     
+    protected function buildOrmWrappers()
+    {
+        return new ORMWrappers();
+    }
+    
     protected function getRootDirectory()
     {
         return realpath(__DIR__.'/../../../');

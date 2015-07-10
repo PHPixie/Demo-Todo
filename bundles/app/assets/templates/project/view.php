@@ -2,33 +2,57 @@
 
 <?php $this->startBlock('head'); ?>
     <script src="/bundles/app/tasks.js"></script>
+    <script>
+        $(function() {
+            tasks.init({
+                doneUrl: "<?=$this->httpPath(
+                    'app.default',
+                    array(
+                        'processor' => 'project',
+                        'action'    => 'markTaskDone'
+                    )
+                )?>",
+                
+                deleteUrl: "<?=$this->httpPath(
+                    'app.default',
+                    array(
+                        'processor' => 'project',
+                        'action'    => 'deleteTask'
+                    )
+                )?>"
+            });
+        });
+    </script>
 <?php $this->endBlock(); ?>
 
-<h4>
-    <?=$_($project->name)?>
-    <span class="badge badge-success">
-        <?=$_($project->tasksCompleted)?>/<?=$_($project->tasksTotal)?>
-    </span>
-</h4>
+<div id="projectTasks" class="<?=$project->isDone()?'done':''; ?>">
+    <h4>
+        <?=$_($project->name)?>
+        <span class="counter badge">
+            <span class="tasksDone"><?=$_($project->tasksDone)?></span>
+            /
+            <span class="tasksTotal"><?=$_($project->tasksTotal)?></span>
+        </span>
+    </h4>
 
-<ul class="list-group">
-    <?php foreach($project->tasks() as $task): ?>
-        <li class="list-group-item">
-            <?php if($task): ?>
-                <i class="fa fa-check-circle fa-lg success"></i>
-            <?php else: ?>
-                <i class="fa fa-circle-o fa-lg"></i>
-            <?php endif; ?>
-            <?=$_($task->name)?>
-        </li>
-    <?php endforeach; ?>
-</ul>
+    <ul class="list-group tasks">
+        <?php foreach($project->tasks() as $task): ?>
+            <li class="task list-group-item <?=$task->isDone?'done':''; ?>" data-id="<?=$task->id?>">
+                <i class="icon fa fa-lg"></i>
+                <span>
+                    <?=$_($task->name)?>
+                </span>
+                <i class="delete fa fa-close fa-lg pull-right"></i>
+            </li>
+        <?php endforeach; ?>
+    </ul>
 
-<?php $action = $this->httpPath('app.default', array('processor' => 'project', 'action' => 'createTask')); ?>
-<form action="<?=$_($action)?>" method="post">
-    <input type="hidden" name="project_id" value="<?=$_($project->id)?>">
-    <div class="form-group">
-        <input type="text" name="name" class="form-control" placeholder="Task name">
-    </div>
-    <button type="submit" class="btn btn-primary">Add task</button>
-</form>
+    <?php $action = $this->httpPath('app.default', array('processor' => 'project', 'action' => 'createTask')); ?>
+    <form action="<?=$_($action)?>" method="post">
+        <input type="hidden" name="projectId" value="<?=$_($project->id)?>">
+        <div class="form-group">
+            <input type="text" name="name" class="form-control" placeholder="Task name">
+        </div>
+        <button type="submit" class="btn btn-primary">Add task</button>
+    </form>
+</div>
