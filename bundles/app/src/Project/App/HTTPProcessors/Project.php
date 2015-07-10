@@ -31,14 +31,7 @@ class Project extends \PHPixie\DefaultBundle\Processor\HTTP\Actions
         $project->tasksCompleted = 0;
         $project->save();
         
-        $url = $this->builder->frameworkBuilder()->http()->routeTranslator()->generatePath(
-            'app',
-            array(
-                'processor' => 'project',
-                'action'    => 'view',
-            )
-        );
-        return $this->builder->components()->http()->responses()->redirect($url);
+        return $this->projectRedirect($project);
     }
     
     public function viewAction($request)
@@ -50,5 +43,35 @@ class Project extends \PHPixie\DefaultBundle\Processor\HTTP\Actions
                 'project' => $project
             )
         );
+    }
+    
+    public function createTaskAction($request)
+    {
+        $orm = $this->builder->components()->orm();
+        $data = $request->data();
+        
+        $project = $orm->query('project')->in($data->getRequired('project_id'))->findOne();
+        
+        $task = $orm->createEntity('task');
+        $task->name = $data->getRequired('name');
+        $task->save();
+        
+        $project->tasks->add($task);
+        $project->tasksTotal = $project->tasksTotal+1;
+        $project->save();
+        
+        return $this->projectRedirect($project);
+    }
+    
+    protected function projectRedirect($project)
+    {
+        $url = $this->builder->frameworkBuilder()->http()->routeTranslator()->generatePath(
+            'app.default',
+            array(
+                'processor' => 'project',
+                'action'    => 'view',
+            )
+        );
+        return $this->builder->components()->http()->responses()->redirect($url);
     }
 }
