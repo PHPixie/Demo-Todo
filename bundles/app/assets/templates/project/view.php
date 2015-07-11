@@ -1,6 +1,6 @@
 <?php $this->layout('app:layout');?>
 
-<?php $this->startBlock('head'); ?>
+<?php $this->startBlock('head');?>
     <script src="/bundles/app/tasks.js"></script>
     <script>
         $(function() {
@@ -8,16 +8,16 @@
                 doneUrl: "<?=$this->httpPath(
                     'app.default',
                     array(
-                        'processor' => 'project',
-                        'action'    => 'markTaskDone'
+                        'processor' => 'task',
+                        'action'    => 'markDone'
                     )
                 )?>",
                 
                 deleteUrl: "<?=$this->httpPath(
                     'app.default',
                     array(
-                        'processor' => 'project',
-                        'action'    => 'deleteTask'
+                        'processor' => 'task',
+                        'action'    => 'delete'
                     )
                 )?>"
             });
@@ -46,13 +46,17 @@
             </li>
         <?php endforeach; ?>
     </ul>
-
-    <?php $action = $this->httpPath('app.default', array('processor' => 'project', 'action' => 'createTask')); ?>
-    <form action="<?=$_($action)?>" method="post">
-        <input type="hidden" name="projectId" value="<?=$_($project->id)?>">
-        <div class="form-group">
-            <input type="text" name="name" class="form-control" placeholder="Task name">
-        </div>
-        <button type="submit" class="btn btn-primary">Add task</button>
-    </form>
 </div>
+
+<hr/>
+<?php $action = $this->httpPath('app.default', array('processor' => 'task', 'action' => 'create')); ?>
+<form action="<?=$_($action)?>" method="post">
+    <input type="hidden" name="projectId" value="<?=$_($project->id)?>">
+    <div class="form-group">
+        <input type="text" name="name" class="form-control" placeholder="Task name">
+    </div>
+    <button type="submit" class="btn btn-primary">Add task</button>
+</form>
+
+<hr/>
+<a href="<?=$this->httpPath('app.default')?>" class="small"><i class="icon fa fa-lg fa-chevron-left"></i> Back to Projects</a>

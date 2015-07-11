@@ -16,7 +16,7 @@ return array(
             'path'     => '(<processor>(/<action>))',
             'defaults' => array(
                 'processor' => 'project',
-                'action'    => 'index'
+                'action'    => 'list'
             )
         )
     )

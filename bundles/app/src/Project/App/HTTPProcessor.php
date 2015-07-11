@@ -14,9 +14,14 @@ class HTTPProcessor extends \PHPixie\DefaultBundle\Processor\HTTP\Builder
     
     protected function buildProjectProcessor()
     {
-        $components = $this->builder->components();
-        
-        return new HTTPProcessors\Project(
+        return new HTTPProcessors\Tracker\Project(
+            $this->builder
+        );
+    }
+    
+    protected function buildTaskProcessor()
+    {
+        return new HTTPProcessors\Tracker\Task(
             $this->builder
         );
     }

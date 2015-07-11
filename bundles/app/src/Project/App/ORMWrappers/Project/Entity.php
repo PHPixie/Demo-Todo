@@ -1,8 +1,8 @@
 <?php
 
-namespace Project\App\ORMWrappers;
+namespace Project\App\ORMWrappers\Project;
 
-class Project extends \PHPixie\ORM\Wrappers\Type\Database\Entity
+class Entity extends \PHPixie\ORM\Wrappers\Type\Database\Entity
 {
     public function isDone()
     {
